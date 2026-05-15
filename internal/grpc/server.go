@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"errors"
+	"os"
 
 	subscriptionService "org-billing-service/internal/service/subscription"
 	stripeCheckout "org-billing-service/internal/stripe"
@@ -24,7 +26,21 @@ func (s *BillingServer) CreateCheckoutSession(
 	req *pb.CreateCheckoutSessionRequest,
 ) (*pb.CreateCheckoutSessionResponse, error) {
 
-	url, err := stripeCheckout.CreateCheckoutSession(req.UserId, req.PriceId)
+	var priceID string
+
+	switch req.Plan {
+	case "pro":
+		priceID = os.Getenv("STRIPE_PRO_PRICE_ID")
+
+	default:
+		return nil, errors.New("invalid plan")
+	}
+
+	url, err := stripeCheckout.CreateCheckoutSession(
+		req.UserId,
+		priceID,
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +55,11 @@ func (s *BillingServer) GetUserSubscription(
 	req *pb.GetUserSubscriptionRequest,
 ) (*pb.GetUserSubscriptionResponse, error) {
 
-	plan, status, err := s.subscriptionService.GetUserSubscription(ctx, req.UserId)
+	plan, status, err := s.subscriptionService.GetUserSubscription(
+		ctx,
+		req.UserId,
+	)
+
 	if err != nil {
 		return nil, err
 	}

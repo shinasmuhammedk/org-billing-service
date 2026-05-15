@@ -14,7 +14,7 @@ service BillingService {
 
 message CreateCheckoutSessionRequest {
   string user_id = 1;
-  string price_id = 2;
+  string plan = 2;
 }
 
 message CreateCheckoutSessionResponse {

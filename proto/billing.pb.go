@@ -24,7 +24,7 @@ const (
 type CreateCheckoutSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	PriceId       string                 `protobuf:"bytes,2,opt,name=price_id,json=priceId,proto3" json:"price_id,omitempty"`
+	Plan          string                 `protobuf:"bytes,2,opt,name=plan,proto3" json:"plan,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -66,9 +66,9 @@ func (x *CreateCheckoutSessionRequest) GetUserId() string {
 	return ""
 }
 
-func (x *CreateCheckoutSessionRequest) GetPriceId() string {
+func (x *CreateCheckoutSessionRequest) GetPlan() string {
 	if x != nil {
-		return x.PriceId
+		return x.Plan
 	}
 	return ""
 }
@@ -217,10 +217,10 @@ var File_proto_billing_proto protoreflect.FileDescriptor
 
 const file_proto_billing_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/billing.proto\x12\abilling\"R\n" +
+	"\x13proto/billing.proto\x12\abilling\"K\n" +
 	"\x1cCreateCheckoutSessionRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x19\n" +
-	"\bprice_id\x18\x02 \x01(\tR\apriceId\"B\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04plan\x18\x02 \x01(\tR\x04plan\"B\n" +
 	"\x1dCreateCheckoutSessionResponse\x12!\n" +
 	"\fcheckout_url\x18\x01 \x01(\tR\vcheckoutUrl\"5\n" +
 	"\x1aGetUserSubscriptionRequest\x12\x17\n" +
