@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	BillingService_CreateCheckoutSession_FullMethodName = "/billing.BillingService/CreateCheckoutSession"
+	BillingService_CreatePortalSession_FullMethodName   = "/billing.BillingService/CreatePortalSession"
 	BillingService_GetUserSubscription_FullMethodName   = "/billing.BillingService/GetUserSubscription"
 )
 
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BillingServiceClient interface {
 	CreateCheckoutSession(ctx context.Context, in *CreateCheckoutSessionRequest, opts ...grpc.CallOption) (*CreateCheckoutSessionResponse, error)
+	CreatePortalSession(ctx context.Context, in *CreatePortalSessionRequest, opts ...grpc.CallOption) (*CreatePortalSessionResponse, error)
 	GetUserSubscription(ctx context.Context, in *GetUserSubscriptionRequest, opts ...grpc.CallOption) (*GetUserSubscriptionResponse, error)
 }
 
@@ -49,6 +51,16 @@ func (c *billingServiceClient) CreateCheckoutSession(ctx context.Context, in *Cr
 	return out, nil
 }
 
+func (c *billingServiceClient) CreatePortalSession(ctx context.Context, in *CreatePortalSessionRequest, opts ...grpc.CallOption) (*CreatePortalSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePortalSessionResponse)
+	err := c.cc.Invoke(ctx, BillingService_CreatePortalSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *billingServiceClient) GetUserSubscription(ctx context.Context, in *GetUserSubscriptionRequest, opts ...grpc.CallOption) (*GetUserSubscriptionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetUserSubscriptionResponse)
@@ -64,6 +76,7 @@ func (c *billingServiceClient) GetUserSubscription(ctx context.Context, in *GetU
 // for forward compatibility.
 type BillingServiceServer interface {
 	CreateCheckoutSession(context.Context, *CreateCheckoutSessionRequest) (*CreateCheckoutSessionResponse, error)
+	CreatePortalSession(context.Context, *CreatePortalSessionRequest) (*CreatePortalSessionResponse, error)
 	GetUserSubscription(context.Context, *GetUserSubscriptionRequest) (*GetUserSubscriptionResponse, error)
 	mustEmbedUnimplementedBillingServiceServer()
 }
@@ -77,6 +90,9 @@ type UnimplementedBillingServiceServer struct{}
 
 func (UnimplementedBillingServiceServer) CreateCheckoutSession(context.Context, *CreateCheckoutSessionRequest) (*CreateCheckoutSessionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateCheckoutSession not implemented")
+}
+func (UnimplementedBillingServiceServer) CreatePortalSession(context.Context, *CreatePortalSessionRequest) (*CreatePortalSessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePortalSession not implemented")
 }
 func (UnimplementedBillingServiceServer) GetUserSubscription(context.Context, *GetUserSubscriptionRequest) (*GetUserSubscriptionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUserSubscription not implemented")
@@ -120,6 +136,24 @@ func _BillingService_CreateCheckoutSession_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BillingService_CreatePortalSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePortalSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BillingServiceServer).CreatePortalSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BillingService_CreatePortalSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BillingServiceServer).CreatePortalSession(ctx, req.(*CreatePortalSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BillingService_GetUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserSubscriptionRequest)
 	if err := dec(in); err != nil {
@@ -148,6 +182,10 @@ var BillingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateCheckoutSession",
 			Handler:    _BillingService_CreateCheckoutSession_Handler,
+		},
+		{
+			MethodName: "CreatePortalSession",
+			Handler:    _BillingService_CreatePortalSession_Handler,
 		},
 		{
 			MethodName: "GetUserSubscription",

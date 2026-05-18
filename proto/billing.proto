@@ -8,6 +8,9 @@ service BillingService {
   rpc CreateCheckoutSession(CreateCheckoutSessionRequest)
       returns (CreateCheckoutSessionResponse);
 
+  rpc CreatePortalSession(CreatePortalSessionRequest)
+      returns (CreatePortalSessionResponse);
+
   rpc GetUserSubscription(GetUserSubscriptionRequest)
       returns (GetUserSubscriptionResponse);
 }
@@ -19,6 +22,14 @@ message CreateCheckoutSessionRequest {
 
 message CreateCheckoutSessionResponse {
   string checkout_url = 1;
+}
+
+message CreatePortalSessionRequest {
+  string user_id = 1;
+}
+
+message CreatePortalSessionResponse {
+  string portal_url = 1;
 }
 
 message GetUserSubscriptionRequest {

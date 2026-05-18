@@ -117,6 +117,94 @@ func (x *CreateCheckoutSessionResponse) GetCheckoutUrl() string {
 	return ""
 }
 
+type CreatePortalSessionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePortalSessionRequest) Reset() {
+	*x = CreatePortalSessionRequest{}
+	mi := &file_proto_billing_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePortalSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePortalSessionRequest) ProtoMessage() {}
+
+func (x *CreatePortalSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_billing_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePortalSessionRequest.ProtoReflect.Descriptor instead.
+func (*CreatePortalSessionRequest) Descriptor() ([]byte, []int) {
+	return file_proto_billing_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreatePortalSessionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type CreatePortalSessionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PortalUrl     string                 `protobuf:"bytes,1,opt,name=portal_url,json=portalUrl,proto3" json:"portal_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePortalSessionResponse) Reset() {
+	*x = CreatePortalSessionResponse{}
+	mi := &file_proto_billing_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePortalSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePortalSessionResponse) ProtoMessage() {}
+
+func (x *CreatePortalSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_billing_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePortalSessionResponse.ProtoReflect.Descriptor instead.
+func (*CreatePortalSessionResponse) Descriptor() ([]byte, []int) {
+	return file_proto_billing_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreatePortalSessionResponse) GetPortalUrl() string {
+	if x != nil {
+		return x.PortalUrl
+	}
+	return ""
+}
+
 type GetUserSubscriptionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -126,7 +214,7 @@ type GetUserSubscriptionRequest struct {
 
 func (x *GetUserSubscriptionRequest) Reset() {
 	*x = GetUserSubscriptionRequest{}
-	mi := &file_proto_billing_proto_msgTypes[2]
+	mi := &file_proto_billing_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -138,7 +226,7 @@ func (x *GetUserSubscriptionRequest) String() string {
 func (*GetUserSubscriptionRequest) ProtoMessage() {}
 
 func (x *GetUserSubscriptionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_billing_proto_msgTypes[2]
+	mi := &file_proto_billing_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,7 +239,7 @@ func (x *GetUserSubscriptionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserSubscriptionRequest.ProtoReflect.Descriptor instead.
 func (*GetUserSubscriptionRequest) Descriptor() ([]byte, []int) {
-	return file_proto_billing_proto_rawDescGZIP(), []int{2}
+	return file_proto_billing_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetUserSubscriptionRequest) GetUserId() string {
@@ -171,7 +259,7 @@ type GetUserSubscriptionResponse struct {
 
 func (x *GetUserSubscriptionResponse) Reset() {
 	*x = GetUserSubscriptionResponse{}
-	mi := &file_proto_billing_proto_msgTypes[3]
+	mi := &file_proto_billing_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +271,7 @@ func (x *GetUserSubscriptionResponse) String() string {
 func (*GetUserSubscriptionResponse) ProtoMessage() {}
 
 func (x *GetUserSubscriptionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_billing_proto_msgTypes[3]
+	mi := &file_proto_billing_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +284,7 @@ func (x *GetUserSubscriptionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserSubscriptionResponse.ProtoReflect.Descriptor instead.
 func (*GetUserSubscriptionResponse) Descriptor() ([]byte, []int) {
-	return file_proto_billing_proto_rawDescGZIP(), []int{3}
+	return file_proto_billing_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetUserSubscriptionResponse) GetPlan() string {
@@ -223,13 +311,19 @@ const file_proto_billing_proto_rawDesc = "" +
 	"\x04plan\x18\x02 \x01(\tR\x04plan\"B\n" +
 	"\x1dCreateCheckoutSessionResponse\x12!\n" +
 	"\fcheckout_url\x18\x01 \x01(\tR\vcheckoutUrl\"5\n" +
+	"\x1aCreatePortalSessionRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"<\n" +
+	"\x1bCreatePortalSessionResponse\x12\x1d\n" +
+	"\n" +
+	"portal_url\x18\x01 \x01(\tR\tportalUrl\"5\n" +
 	"\x1aGetUserSubscriptionRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"I\n" +
 	"\x1bGetUserSubscriptionResponse\x12\x12\n" +
 	"\x04plan\x18\x01 \x01(\tR\x04plan\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2\xda\x01\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status2\xbc\x02\n" +
 	"\x0eBillingService\x12f\n" +
 	"\x15CreateCheckoutSession\x12%.billing.CreateCheckoutSessionRequest\x1a&.billing.CreateCheckoutSessionResponse\x12`\n" +
+	"\x13CreatePortalSession\x12#.billing.CreatePortalSessionRequest\x1a$.billing.CreatePortalSessionResponse\x12`\n" +
 	"\x13GetUserSubscription\x12#.billing.GetUserSubscriptionRequest\x1a$.billing.GetUserSubscriptionResponseB\tZ\a./protob\x06proto3"
 
 var (
@@ -244,20 +338,24 @@ func file_proto_billing_proto_rawDescGZIP() []byte {
 	return file_proto_billing_proto_rawDescData
 }
 
-var file_proto_billing_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_billing_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_billing_proto_goTypes = []any{
 	(*CreateCheckoutSessionRequest)(nil),  // 0: billing.CreateCheckoutSessionRequest
 	(*CreateCheckoutSessionResponse)(nil), // 1: billing.CreateCheckoutSessionResponse
-	(*GetUserSubscriptionRequest)(nil),    // 2: billing.GetUserSubscriptionRequest
-	(*GetUserSubscriptionResponse)(nil),   // 3: billing.GetUserSubscriptionResponse
+	(*CreatePortalSessionRequest)(nil),    // 2: billing.CreatePortalSessionRequest
+	(*CreatePortalSessionResponse)(nil),   // 3: billing.CreatePortalSessionResponse
+	(*GetUserSubscriptionRequest)(nil),    // 4: billing.GetUserSubscriptionRequest
+	(*GetUserSubscriptionResponse)(nil),   // 5: billing.GetUserSubscriptionResponse
 }
 var file_proto_billing_proto_depIdxs = []int32{
 	0, // 0: billing.BillingService.CreateCheckoutSession:input_type -> billing.CreateCheckoutSessionRequest
-	2, // 1: billing.BillingService.GetUserSubscription:input_type -> billing.GetUserSubscriptionRequest
-	1, // 2: billing.BillingService.CreateCheckoutSession:output_type -> billing.CreateCheckoutSessionResponse
-	3, // 3: billing.BillingService.GetUserSubscription:output_type -> billing.GetUserSubscriptionResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	2, // 1: billing.BillingService.CreatePortalSession:input_type -> billing.CreatePortalSessionRequest
+	4, // 2: billing.BillingService.GetUserSubscription:input_type -> billing.GetUserSubscriptionRequest
+	1, // 3: billing.BillingService.CreateCheckoutSession:output_type -> billing.CreateCheckoutSessionResponse
+	3, // 4: billing.BillingService.CreatePortalSession:output_type -> billing.CreatePortalSessionResponse
+	5, // 5: billing.BillingService.GetUserSubscription:output_type -> billing.GetUserSubscriptionResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -274,7 +372,7 @@ func file_proto_billing_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_billing_proto_rawDesc), len(file_proto_billing_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

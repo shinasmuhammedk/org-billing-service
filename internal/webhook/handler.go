@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stripe/stripe-go/v82"
 	"github.com/stripe/stripe-go/v82/subscription"
-	"github.com/stripe/stripe-go/v82/webhook"
+	stripewebhook "github.com/stripe/stripe-go/v82/webhook"
 )
 
 func StripeWebhook(c *gin.Context) {
@@ -34,11 +34,11 @@ func StripeWebhook(c *gin.Context) {
 
 	signatureHeader := c.GetHeader("Stripe-Signature")
 
-	event, err := webhook.ConstructEventWithOptions(
+	event, err := stripewebhook.ConstructEventWithOptions(
 		payload,
 		signatureHeader,
 		os.Getenv("STRIPE_WEBHOOK_SECRET"),
-		webhook.ConstructEventOptions{
+		stripewebhook.ConstructEventOptions{
 			IgnoreAPIVersionMismatch: true,
 		},
 	)
@@ -52,52 +52,89 @@ func StripeWebhook(c *gin.Context) {
 		return
 	}
 
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+
+	log.Println("Stripe event received:", event.Type)
+
 	switch event.Type {
 
 	case "checkout.session.completed":
+		var checkoutSession stripe.CheckoutSession
 
-		var session stripe.CheckoutSession
-
-		err := json.Unmarshal(event.Data.Raw, &session)
-		if err != nil {
+		if err := json.Unmarshal(event.Data.Raw, &checkoutSession); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "failed to parse checkout session",
 			})
 			return
 		}
 
-		userID := session.Metadata["user_id"]
+		userID := checkoutSession.Metadata["user_id"]
+
+		if userID == "" {
+			log.Println("missing user_id in checkout metadata")
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "missing user_id in checkout metadata",
+			})
+			return
+		}
+
+		if checkoutSession.Customer == nil || checkoutSession.Customer.ID == "" {
+			log.Println("missing customer id in checkout session")
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "missing customer id",
+			})
+			return
+		}
+
+		if checkoutSession.Subscription == nil || checkoutSession.Subscription.ID == "" {
+			log.Println("missing subscription id in checkout session")
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "missing subscription id",
+			})
+			return
+		}
+
+		subscriptionID := checkoutSession.Subscription.ID
+		customerID := checkoutSession.Customer.ID
 
 		log.Println("===== CHECKOUT COMPLETED =====")
 		log.Println("User ID:", userID)
-		log.Println("Customer ID:", session.Customer.ID)
-		log.Println("Subscription ID:", session.Subscription.ID)
-
-		subscriptionID := session.Subscription.ID
-		customerID := session.Customer.ID
+		log.Println("Customer ID:", customerID)
+		log.Println("Subscription ID:", subscriptionID)
 
 		sub, err := subscription.Get(subscriptionID, nil)
 		if err != nil {
 			log.Println("failed to retrieve subscription:", err)
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to retrieve subscription",
+			})
 			return
 		}
 
-		if len(sub.Items.Data) == 0 {
+		if len(sub.Items.Data) == 0 || sub.Items.Data[0].Price == nil {
 			log.Println("subscription has no price item")
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "subscription has no price item",
+			})
 			return
 		}
 
 		priceID := sub.Items.Data[0].Price.ID
 		status := string(sub.Status)
-
-		currentPeriodEnd := time.Unix(
-			sub.Items.Data[0].CurrentPeriodEnd,
-			0,
-		)
+		currentPeriodEnd := time.Unix(sub.Items.Data[0].CurrentPeriodEnd, 0)
 
 		parsedUserID, err := uuid.Parse(userID)
 		if err != nil {
 			log.Println("invalid user id:", err)
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid user id",
+			})
 			return
 		}
 
@@ -113,11 +150,14 @@ func StripeWebhook(c *gin.Context) {
 
 		if err != nil {
 			log.Println("failed to sync subscription:", err)
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to sync subscription",
+			})
 			return
 		}
 
 		log.Println("subscription saved successfully")
-
 		log.Println("===== STRIPE SUBSCRIPTION DETAILS =====")
 		log.Println("Customer ID:", customerID)
 		log.Println("Subscription ID:", subscriptionID)
@@ -132,6 +172,9 @@ func StripeWebhook(c *gin.Context) {
 
 	case "invoice.payment_failed":
 		log.Println("payment failed")
+
+	default:
+		log.Println("unhandled event:", event.Type)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

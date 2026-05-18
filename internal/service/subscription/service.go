@@ -3,6 +3,7 @@ package subscription
 import (
 	"context"
 	"org-billing-service/internal/db"
+	"org-billing-service/internal/helper"
 	"time"
 
 	repo "org-billing-service/internal/repo/subscription"
@@ -73,8 +74,8 @@ func (s *Service) SyncSubscription(
 			Valid:  true,
 		},
 
-		Plan:   priceID,
-		Status: status,
+		Plan: helper.GetPlanFromPriceID(priceID), 
+        Status: status,
 
 		CurrentPeriodEnd: pgtype.Timestamp{
 			Time:  currentPeriodEnd,
@@ -83,4 +84,21 @@ func (s *Service) SyncSubscription(
 	})
 
 	return err
+}
+
+func (s *Service) GetStripeCustomerID(
+	ctx context.Context,
+	userID string,
+) (string, error) {
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return "", err
+	}
+
+	subscription, err := s.repo.GetByUserID(ctx, parsedUserID)
+	if err != nil {
+		return "", err
+	}
+
+	return subscription.StripeCustomerID.String, nil
 }
