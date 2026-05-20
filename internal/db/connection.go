@@ -2,7 +2,9 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -11,7 +13,20 @@ var Pool *pgxpool.Pool
 var QueriesInstance *Queries
 
 func Connect() {
-	dsn := "postgres://postgres:Shinas@localhost:5432/billing_db?sslmode=disable"
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	name := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		user,
+		password,
+		host,
+		port,
+		name,
+	)
 
 	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
