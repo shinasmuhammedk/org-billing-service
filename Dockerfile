@@ -15,6 +15,8 @@ WORKDIR /app
 
 COPY --from=builder /app/billing-service .
 
+RUN mkdir -p logs
+
 EXPOSE 50052
 EXPOSE 8081
 

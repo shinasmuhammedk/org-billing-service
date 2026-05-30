@@ -1,9 +1,17 @@
 package webhook
 
-import subscriptionService "org-billing-service/internal/service/subscription"
+import (
+	"log/slog"
 
-var SubscriptionService *subscriptionService.Service
+	subscriptionService "org-billing-service/internal/service/subscription"
+)
 
-func Init(service *subscriptionService.Service) {
+var (
+	SubscriptionService *subscriptionService.Service
+	appLogger           *slog.Logger
+)
+
+func Init(service *subscriptionService.Service, logger *slog.Logger) {
 	SubscriptionService = service
+	appLogger = logger
 }

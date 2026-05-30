@@ -3,7 +3,6 @@ package webhook
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -26,6 +25,11 @@ func StripeWebhook(c *gin.Context) {
 
 	payload, err := io.ReadAll(c.Request.Body)
 	if err != nil {
+
+		appLogger.Error("failed to read stripe webhook body",
+			"error", err.Error(),
+		)
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "failed to read body",
 		})
@@ -44,7 +48,10 @@ func StripeWebhook(c *gin.Context) {
 	)
 
 	if err != nil {
-		log.Println("Stripe webhook signature error:", err)
+
+		appLogger.Error("stripe webhook signature verification failed",
+			"error", err.Error(),
+		)
 
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -54,14 +61,22 @@ func StripeWebhook(c *gin.Context) {
 
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
-	log.Println("Stripe event received:", event.Type)
+	appLogger.Info("stripe event received",
+		"event_type", event.Type,
+	)
 
 	switch event.Type {
 
 	case "checkout.session.completed":
+
 		var checkoutSession stripe.CheckoutSession
 
 		if err := json.Unmarshal(event.Data.Raw, &checkoutSession); err != nil {
+
+			appLogger.Error("failed to parse checkout session",
+				"error", err.Error(),
+			)
+
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "failed to parse checkout session",
 			})
@@ -71,7 +86,8 @@ func StripeWebhook(c *gin.Context) {
 		userID := checkoutSession.Metadata["user_id"]
 
 		if userID == "" {
-			log.Println("missing user_id in checkout metadata")
+
+			appLogger.Error("missing user_id in checkout metadata")
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "missing user_id in checkout metadata",
@@ -80,7 +96,10 @@ func StripeWebhook(c *gin.Context) {
 		}
 
 		if checkoutSession.Customer == nil || checkoutSession.Customer.ID == "" {
-			log.Println("missing customer id in checkout session")
+
+			appLogger.Error("missing customer id in checkout session",
+				"user_id", userID,
+			)
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "missing customer id",
@@ -89,7 +108,10 @@ func StripeWebhook(c *gin.Context) {
 		}
 
 		if checkoutSession.Subscription == nil || checkoutSession.Subscription.ID == "" {
-			log.Println("missing subscription id in checkout session")
+
+			appLogger.Error("missing subscription id in checkout session",
+				"user_id", userID,
+			)
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "missing subscription id",
@@ -100,14 +122,19 @@ func StripeWebhook(c *gin.Context) {
 		subscriptionID := checkoutSession.Subscription.ID
 		customerID := checkoutSession.Customer.ID
 
-		log.Println("===== CHECKOUT COMPLETED =====")
-		log.Println("User ID:", userID)
-		log.Println("Customer ID:", customerID)
-		log.Println("Subscription ID:", subscriptionID)
+		appLogger.Info("checkout session completed",
+			"user_id", userID,
+			"customer_id", customerID,
+			"subscription_id", subscriptionID,
+		)
 
 		sub, err := subscription.Get(subscriptionID, nil)
 		if err != nil {
-			log.Println("failed to retrieve subscription:", err)
+
+			appLogger.Error("failed to retrieve subscription from stripe",
+				"subscription_id", subscriptionID,
+				"error", err.Error(),
+			)
 
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "failed to retrieve subscription",
@@ -116,7 +143,10 @@ func StripeWebhook(c *gin.Context) {
 		}
 
 		if len(sub.Items.Data) == 0 || sub.Items.Data[0].Price == nil {
-			log.Println("subscription has no price item")
+
+			appLogger.Error("subscription has no price item",
+				"subscription_id", subscriptionID,
+			)
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "subscription has no price item",
@@ -130,7 +160,11 @@ func StripeWebhook(c *gin.Context) {
 
 		parsedUserID, err := uuid.Parse(userID)
 		if err != nil {
-			log.Println("invalid user id:", err)
+
+			appLogger.Error("invalid user id",
+				"user_id", userID,
+				"error", err.Error(),
+			)
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid user id",
@@ -149,7 +183,15 @@ func StripeWebhook(c *gin.Context) {
 		)
 
 		if err != nil {
-			log.Println("failed to sync subscription:", err)
+
+			appLogger.Error("failed to sync subscription",
+				"user_id", userID,
+				"customer_id", customerID,
+				"subscription_id", subscriptionID,
+				"price_id", priceID,
+				"status", status,
+				"error", err.Error(),
+			)
 
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "failed to sync subscription",
@@ -157,24 +199,31 @@ func StripeWebhook(c *gin.Context) {
 			return
 		}
 
-		log.Println("subscription saved successfully")
-		log.Println("===== STRIPE SUBSCRIPTION DETAILS =====")
-		log.Println("Customer ID:", customerID)
-		log.Println("Subscription ID:", subscriptionID)
-		log.Println("Price ID:", priceID)
-		log.Println("Status:", status)
+		appLogger.Info("subscription synced successfully",
+			"user_id", userID,
+			"customer_id", customerID,
+			"subscription_id", subscriptionID,
+			"price_id", priceID,
+			"status", status,
+		)
 
 	case "customer.subscription.updated":
-		log.Println("subscription updated")
+
+		appLogger.Info("customer subscription updated event received")
 
 	case "customer.subscription.deleted":
-		log.Println("subscription deleted")
+
+		appLogger.Warn("customer subscription deleted event received")
 
 	case "invoice.payment_failed":
-		log.Println("payment failed")
+
+		appLogger.Error("invoice payment failed event received")
 
 	default:
-		log.Println("unhandled event:", event.Type)
+
+		appLogger.Warn("unhandled stripe event received",
+			"event_type", event.Type,
+		)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

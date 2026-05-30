@@ -3,22 +3,24 @@ package grpc
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"os"
 
 	subscriptionService "org-billing-service/internal/service/subscription"
 	stripeCheckout "org-billing-service/internal/stripe"
 	pb "org-billing-service/proto"
-
 )
 
 type BillingServer struct {
 	pb.UnimplementedBillingServiceServer
 	subscriptionService *subscriptionService.Service
+	logger              *slog.Logger
 }
 
-func NewBillingServer(subscriptionService *subscriptionService.Service) *BillingServer {
+func NewBillingServer(subscriptionService *subscriptionService.Service,logger *slog.Logger) *BillingServer {
 	return &BillingServer{
 		subscriptionService: subscriptionService,
+        logger: logger,
 	}
 }
 

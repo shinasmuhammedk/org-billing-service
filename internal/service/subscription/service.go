@@ -2,6 +2,7 @@ package subscription
 
 import (
 	"context"
+	"log/slog"
 	"org-billing-service/internal/db"
 	"org-billing-service/internal/helper"
 	"time"
@@ -14,11 +15,13 @@ import (
 
 type Service struct {
 	repo repo.Repository
+    logger *slog.Logger
 }
 
-func NewService(r repo.Repository) *Service {
+func NewService(r repo.Repository, logger *slog.Logger) *Service {
 	return &Service{
 		repo: r,
+        logger: logger,
 	}
 }
 
